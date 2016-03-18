@@ -1,4 +1,9 @@
 ### 主要针对配置文件解析
+
+```
+go get github.com/sosop/libconfig
+```
+
 #### 一、解析ini文件
 
 app.ini
@@ -81,5 +86,64 @@ func main() {
 }
 ```
 输出：{[{192.168.1.100 6379} {192.168.1.101 6380} {192.168.1.102 6381}] [{172.20.10.8 3306} {172.20.10.9 3308} {172.20.10.10 3310}]}
+
+#### 三、解析xml
+config.xml
+
+```
+<?xml version="1.0"?>
+<config>
+	<appname>testXml</appname>
+	<host>0.0.0.0</host>
+  	<port>8888</port>
+	
+	<group>
+		<value>log</value>
+		<value>queue</value>
+	</group>
+	
+	
+	<es name="es1">
+		<host>192.168.1.2</host>
+		<port>7989</port>
+		<shard>1</shard>
+	</es>
+	<es name="es2">
+		<host>192.168.1.3</host>
+		<port>7986</port>
+		<shard>2</shard>
+	</es>
+	<es name="es3">
+		<host>192.168.1.4</host>
+		<port>7988</port>
+		<shard>3</shard>
+	</es>
+</config>
+```
+
+```
+type ES struct {
+	Name  string `xml:"name,attr"`
+	Host  string `xml:"host"`
+	Port  int    `xml:"port"`
+	Shard int    `xml:"shard"`
+}
+
+type XMLConfig struct {
+	Appname string   `xml:"appname"`
+	Host    string   `xml:"host"`
+	Port    int      `xml:"port"`
+	Group   []string `xml:"group>value"`
+	ESS     []ES     `xml:"es"`
+}
+
+func main() {
+	xmlConf := &XMLConfig{}
+	libconfig.NewXmlConfig("config.xml", xmlConf)
+	fmt.Println(*xmlConf)
+}
+```
+
+输出：{testXml 0.0.0.0 8888 [log queue] [{es1 192.168.1.2 7989 1} {es2 192.168.1.3 7986 2} {es3 192.168.1.4 7988 3}]}
 
 
