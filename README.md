@@ -146,4 +146,7 @@ func main() {
 
 输出：{testXml 0.0.0.0 8888 [log queue] [{es1 192.168.1.2 7989 1} {es2 192.168.1.3 7986 2} {es3 192.168.1.4 7988 3}]}
 
+#### 四、yaml
+[go-yaml](https://github.com/go-yaml/yaml)
+
 
