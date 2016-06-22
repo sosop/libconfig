@@ -24,4 +24,7 @@ func TestGet(t *testing.T) {
 	if iniConf.GetBool("testBool") != true {
 		t.Fatal("error get bool")
 	}
+	if iniConf.GetString("appname") != "test" {
+		t.Fatal("error get string")
+	}
 }
