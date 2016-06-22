@@ -10,8 +10,8 @@ import (
 
 // IniConfig kv的配置文件
 type IniConfig struct {
-	filename string
-	entry    map[string]interface{}
+	Filename string
+	Entry    map[string]interface{}
 }
 
 // NewIniConfig 构造器，读取文件
@@ -23,13 +23,13 @@ func NewIniConfig(filename string) *IniConfig {
 
 // NewIniConfigAsReader 构造器，输入流
 func NewIniConfigAsReader(reader io.Reader) *IniConfig {
-	iniConfig := &IniConfig{entry: make(map[string]interface{}, 32)}
+	iniConfig := &IniConfig{Entry: make(map[string]interface{}, 32)}
 	iniConfig.parseReader(reader)
 	return iniConfig
 }
 
 func (c *IniConfig) parse() {
-	file, err := os.Open(c.filename)
+	file, err := os.Open(c.Filename)
 	if err != nil {
 		panic(err)
 	}
@@ -53,7 +53,7 @@ func (c *IniConfig) parseReader(reader io.Reader) {
 			if tagName != "" {
 				key = tagName + "::" + key
 			}
-			c.entry[key] = strings.TrimSpace(kv[1])
+			c.Entry[key] = strings.TrimSpace(kv[1])
 		}
 	}
 	if err := scan.Err(); err != nil {
@@ -63,7 +63,7 @@ func (c *IniConfig) parseReader(reader io.Reader) {
 
 // GetString 获取字符串
 func (c *IniConfig) GetString(key string, defaultValue ...string) string {
-	if val, ok := c.entry[key]; ok {
+	if val, ok := c.Entry[key]; ok {
 		return val.(string)
 	}
 	if len(defaultValue) > 0 {
@@ -74,7 +74,7 @@ func (c *IniConfig) GetString(key string, defaultValue ...string) string {
 
 // GetBool 获取bool值
 func (c *IniConfig) GetBool(key string, defaultValue ...bool) bool {
-	if val, ok := c.entry[key]; ok {
+	if val, ok := c.Entry[key]; ok {
 		ret, err := strconv.ParseBool(val.(string))
 		if err != nil {
 			panic(err)
@@ -89,7 +89,7 @@ func (c *IniConfig) GetBool(key string, defaultValue ...bool) bool {
 
 // GetInt 获取整型
 func (c *IniConfig) GetInt(key string, defaultValue ...int) int {
-	if val, ok := c.entry[key]; ok {
+	if val, ok := c.Entry[key]; ok {
 		ret, err := strconv.Atoi(val.(string))
 		if err != nil {
 			panic(err)
@@ -104,5 +104,5 @@ func (c *IniConfig) GetInt(key string, defaultValue ...int) int {
 
 // Set 设置
 func (c *IniConfig) Set(key string, value interface{}) {
-	c.entry[strings.TrimSpace(key)] = value
+	c.Entry[strings.TrimSpace(key)] = value
 }
