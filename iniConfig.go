@@ -2,6 +2,7 @@ package libconfig
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"os"
 	"strconv"
@@ -11,19 +12,19 @@ import (
 // IniConfig kv的配置文件
 type IniConfig struct {
 	Filename string
-	Entry    map[string]interface{}
+	Entry    map[string]string
 }
 
 // NewIniConfig 构造器，读取文件
 func NewIniConfig(filename string) *IniConfig {
-	iniConfig := &IniConfig{filename, make(map[string]interface{}, 32)}
+	iniConfig := &IniConfig{filename, make(map[string]string, 32)}
 	iniConfig.parse()
 	return iniConfig
 }
 
 // NewIniConfigAsReader 构造器，输入流
 func NewIniConfigAsReader(reader io.Reader) *IniConfig {
-	iniConfig := &IniConfig{Entry: make(map[string]interface{}, 32)}
+	iniConfig := &IniConfig{Entry: make(map[string]string, 32)}
 	iniConfig.parseReader(reader)
 	return iniConfig
 }
@@ -64,7 +65,7 @@ func (c *IniConfig) parseReader(reader io.Reader) {
 // GetString 获取字符串
 func (c *IniConfig) GetString(key string, defaultValue ...string) string {
 	if val, ok := c.Entry[key]; ok {
-		return val.(string)
+		return val
 	}
 	if len(defaultValue) > 0 {
 		return defaultValue[0]
@@ -75,7 +76,7 @@ func (c *IniConfig) GetString(key string, defaultValue ...string) string {
 // GetBool 获取bool值
 func (c *IniConfig) GetBool(key string, defaultValue ...bool) bool {
 	if val, ok := c.Entry[key]; ok {
-		ret, err := strconv.ParseBool(val.(string))
+		ret, err := strconv.ParseBool(val)
 		if err != nil {
 			panic(err)
 		}
@@ -90,7 +91,7 @@ func (c *IniConfig) GetBool(key string, defaultValue ...bool) bool {
 // GetInt 获取整型
 func (c *IniConfig) GetInt(key string, defaultValue ...int) int {
 	if val, ok := c.Entry[key]; ok {
-		ret, err := strconv.Atoi(val.(string))
+		ret, err := strconv.Atoi(val)
 		if err != nil {
 			panic(err)
 		}
@@ -104,5 +105,5 @@ func (c *IniConfig) GetInt(key string, defaultValue ...int) int {
 
 // Set 设置
 func (c *IniConfig) Set(key string, value interface{}) {
-	c.Entry[strings.TrimSpace(key)] = value
+	c.Entry[strings.TrimSpace(key)] = fmt.Sprint(value)
 }
