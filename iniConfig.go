@@ -11,13 +11,14 @@ import (
 
 // IniConfig kv的配置文件
 type IniConfig struct {
+	Mode     string
 	Filename string
 	Entry    map[string]string
 }
 
 // NewIniConfig 构造器，读取文件
 func NewIniConfig(filename string) *IniConfig {
-	iniConfig := &IniConfig{filename, make(map[string]string, 32)}
+	iniConfig := &IniConfig{Filename: filename, Entry:make(map[string]string, 32)}
 	iniConfig.parse()
 	return iniConfig
 }
@@ -60,11 +61,16 @@ func (c *IniConfig) parseReader(reader io.Reader) {
 	if err := scan.Err(); err != nil {
 		panic(err)
 	}
+	if mode, ok := c.Entry["mode"]; ok {
+		c.Mode = mode
+	} else {
+		c.Mode = ""
+	}
 }
 
 // GetString 获取字符串
 func (c *IniConfig) GetString(key string, defaultValue ...string) string {
-	if val, ok := c.Entry[key]; ok {
+	if val, ok := c.Entry[c.Mode + "::" + key]; ok {
 		return val
 	}
 	if len(defaultValue) > 0 {
@@ -75,7 +81,7 @@ func (c *IniConfig) GetString(key string, defaultValue ...string) string {
 
 // GetBool 获取bool值
 func (c *IniConfig) GetBool(key string, defaultValue ...bool) bool {
-	if val, ok := c.Entry[key]; ok {
+	if val, ok := c.Entry[c.Mode + "::" + key]; ok {
 		ret, err := strconv.ParseBool(val)
 		if err != nil {
 			panic(err)
@@ -90,7 +96,7 @@ func (c *IniConfig) GetBool(key string, defaultValue ...bool) bool {
 
 // GetInt 获取整型
 func (c *IniConfig) GetInt(key string, defaultValue ...int) int {
-	if val, ok := c.Entry[key]; ok {
+	if val, ok := c.Entry[c.Mode + "::" + key]; ok {
 		ret, err := strconv.Atoi(val)
 		if err != nil {
 			panic(err)
@@ -105,5 +111,5 @@ func (c *IniConfig) GetInt(key string, defaultValue ...int) int {
 
 // Set 设置
 func (c *IniConfig) Set(key string, value interface{}) {
-	c.Entry[strings.TrimSpace(key)] = fmt.Sprint(value)
+	c.Entry[strings.TrimSpace(c.Mode + "::" + key)] = fmt.Sprint(value)
 }
